@@ -43,5 +43,13 @@ st.line_chart(df, x="created_at", y=env_metrics)
 
 st.write("**Particle Metrics**")
 particle_metrics = [c for c in df.columns if "particle" in c]
-particle_metrics = sorted(particle_metrics, key=lambda x: int(x.split()[1][:-2])) 
+
+def particle_metrics_sorter(pm: str):
+    val_str = pm.split()[1][:-2]
+    if val_str.startswith("0"):
+        val_str = "0." + val_str[1:]
+    breakpoint()
+    return float(val_str)
+
+particle_metrics = sorted(particle_metrics, key=particle_metrics_sorter) 
 st.line_chart(df, x="created_at", y=particle_metrics)
