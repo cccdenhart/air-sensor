@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 from supabase import Client, create_client
@@ -13,6 +14,8 @@ def get_data():
 
     df = pd.DataFrame(response.data)
 
+    df["created_at"] = df["created_at"].apply(pd.to_datetime).dt.tz_convert('US/Pacific')
+
     return df
 
 
@@ -27,4 +30,18 @@ st.subheader("Temperature and Humidity")
 st.line_chart(df, x="created_at", y=["temperature_c", "humidity_relative"])
 
 st.subheader("Air Quality")
-st.line_chart(df, x="created_at", y=["pm10 standard", "pm25 standard", "pm100 standard"])
+
+st.write("**Standard Measurements**")
+standard_metrics = [c for c in df.columns if "standard" in c]
+standard_metrics = sorted(standard_metrics, key=lambda x: int(x.split()[0][2:])) 
+st.line_chart(df, x="created_at", y=standard_metrics)
+
+st.write("**Environment Measurements**")
+env_metrics = [c for c in df.columns if "env" in c]
+env_metrics = sorted(env_metrics, key=lambda x: int(x.split()[0][2:])) 
+st.line_chart(df, x="created_at", y=env_metrics)
+
+st.write("**Particle Metrics**")
+particle_metrics = [c for c in df.columns if "particle" in c]
+particle_metrics = sorted(particle_metrics, key=lambda x: int(x.split()[1][:-2])) 
+st.line_chart(df, x="created_at", y=particle_metrics)
