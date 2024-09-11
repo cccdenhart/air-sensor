@@ -10,7 +10,7 @@ def get_data():
     key: str = st.secrets["SUPABASE_KEY"]
     supabase: Client = create_client(url, key)
 
-    response = supabase.table('sensor').select('*').execute()
+    response = supabase.table('sensor').select('*').order("created_at", desc=True).limit(1000).execute()
 
     df = pd.DataFrame(response.data)
 
@@ -52,3 +52,7 @@ def particle_metrics_sorter(pm: str):
 
 particle_metrics = sorted(particle_metrics, key=particle_metrics_sorter) 
 st.line_chart(df, x="created_at", y=particle_metrics)
+
+st.divider()
+
+st.write(df)
